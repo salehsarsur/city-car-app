@@ -3,7 +3,6 @@ from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from functools import wraps
-from waitress import serve
 import os
 import bcrypt
 
@@ -152,5 +151,4 @@ def change_passcode():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    serve(app, host='0.0.0.0', port=8000)
-
+    app.run(debug=True)
