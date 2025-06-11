@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html>
-<head><title>Home</title></head>
+<head>
+  <title>Home</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 <body>
-  <h2>Welcome to the City Car App</h2>
-  <ul>
-    <li><a href="/add">Add a Car</a></li>
-    <li><a href="/search">Search Cars</a></li>
-    <li><a href="/delete">Delete a Car</a></li>
-  </ul>
+  <div class="centered">
+    <h2>Welcome to the City Car App</h2>
+    <div>
+      <a href="/add" class="link-button">Add a Car</a>
+      <a href="/search" class="link-button">Search Cars</a>
+      <a href="/delete" class="link-button">Delete a Car</a>
+    </div>
+  </div>
 </body>
 </html>

@@ -1,25 +1,30 @@
 <!DOCTYPE html>
 <html>
-<head><title>Search Cars</title></head>
+<head>
+  <title>Search Cars</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 <body>
-  <h2>Search Cars</h2>
-  <form method="POST">
-    <input type="text" name="license_plate" placeholder="License Plate"><br>
-    <input type="text" name="color" placeholder="Color"><br>
-    <input type="text" name="type" placeholder="Type"><br>
-    <input type="text" name="owner" placeholder="Owner Name"><br>
-    <button type="submit">Search</button>
-  </form>
+  <div class="centered">
+    <h2>Search Cars</h2>
+    <form method="POST">
+      <input type="text" name="license_plate" placeholder="License Plate">
+      <input type="text" name="color" placeholder="Color">
+      <input type="text" name="type" placeholder="Type">
+      <input type="text" name="owner" placeholder="Owner Name">
+      <button type="submit">Search</button>
+    </form>
 
-  {% if results %}
-    <h3>Results:</h3>
-    <ul>
-      {% for car in results %}
-        <li>{{ car.license_plate }} - {{ car.color }} - {{ car.type }} - {{ car.owner }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-  <br>
-  <a href="/home">Back to Home</a>
+    {% if results %}
+      <h3>Results:</h3>
+      <ul>
+        {% for car in results %}
+          <li>{{ car.license_plate }} - {{ car.color }} - {{ car.type }} - {{ car.owner }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <a href="/home" class="link-button">Back to Home</a>
+  </div>
 </body>
 </html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Invalid Passcode</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="error-box">
+    <h2>Invalid Passcode</h2>
+    <form action="/login" method="get">
+      <button type="submit">Try Again</button>
+    </form>
+  </div>
+</body>
+</html>

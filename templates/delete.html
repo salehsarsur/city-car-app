@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html>
-<head><title>Delete Car</title></head>
+<head>
+  <title>Delete Car</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 <body>
-  <h2>Delete a Car</h2>
-  <form method="POST">
-    <input type="text" name="license_plate" placeholder="License Plate" required>
-    <button type="submit">Delete</button>
-  </form>
-  <br>
-  <a href="/home">Back to Home</a>
+  <div class="centered">
+    <h2>Delete a Car</h2>
+    <form method="POST">
+      <input type="text" name="license_plate" placeholder="License Plate" required>
+      <button type="submit">Delete</button>
+    </form>
+    <a href="/home" class="link-button">Back to Home</a>
+  </div>
 </body>
 </html>

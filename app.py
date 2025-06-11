@@ -1,12 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
+from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+from functools import wraps
 import os
 import bcrypt
 
 load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # Random secret key for session encryption
+app.permanent_session_lifetime = timedelta(minutes=30)  # Session lasts 30 min
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -25,13 +29,29 @@ def get_passcode_hash():
     return os.getenv("PASSCODE_HASH", "")
 
 def check_passcode(passcode):
+    load_dotenv(override=True)  # 🔁 Reloads updated .env each time
     stored_hash = get_passcode_hash().encode()
     return bcrypt.checkpw(passcode.encode(), stored_hash)
+
 
 def update_passcode(new_passcode):
     hashed = bcrypt.hashpw(new_passcode.encode(), bcrypt.gensalt())
     with open(".env", "w") as f:
         f.write(f"PASSCODE_HASH={hashed.decode()}")
+        
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        load_dotenv(override=True)  # Make sure we get updated .env
+        current_hash = get_passcode_hash()
+        session_hash = session.get('passcode_hash')
+
+        if not session.get('logged_in') or session_hash != current_hash:
+            session.clear()
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 # ------------------ Routes ------------------
 
@@ -44,15 +64,21 @@ def login():
     if request.method == 'POST':
         passcode = request.form['passcode']
         if check_passcode(passcode):
+            session.permanent = True
+            session['logged_in'] = True
+            session['passcode_hash'] = get_passcode_hash()
             return redirect(url_for('home'))
-        return "Invalid passcode", 403
+        return render_template('invalid.html'), 403
     return render_template('login.html')
 
+
 @app.route('/home')
+@login_required
 def home():
     return render_template('home.html')
 
 @app.route('/add', methods=['GET', 'POST'])
+@login_required
 def add():
     if request.method == 'POST':
         license_plate = request.form['license_plate']
@@ -71,6 +97,7 @@ def add():
     return render_template('add.html')
 
 @app.route('/search', methods=['GET', 'POST'])
+@login_required
 def search():
     results = []
     if request.method == 'POST':
@@ -93,10 +120,11 @@ def search():
     return render_template('search.html', results=results)
 
 @app.route('/delete', methods=['GET', 'POST'])
+@login_required
 def delete():
     if request.method == 'POST':
         license_plate = request.form['license_plate']
-        car = Car.query.get(license_plate)
+        car = db.session.get(Car, license_plate)
         if car:
             db.session.delete(car)
             db.session.commit()
