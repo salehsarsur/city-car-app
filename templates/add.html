@@ -1,7 +1,16 @@
-<form method="post">
-  <input name="license_plate" placeholder="License Plate" required />
-  <input name="color" placeholder="Color" required />
-  <input name="type" placeholder="Type" required />
-  <input name="owner_name" placeholder="Owner Name" required />
-  <button type="submit">Add</button>
-</form>
+<!DOCTYPE html>
+<html>
+<head><title>Add Car</title></head>
+<body>
+  <h2>Add a New Car</h2>
+  <form method="POST">
+    <input type="text" name="license_plate" placeholder="License Plate" required><br>
+    <input type="text" name="color" placeholder="Color" required><br>
+    <input type="text" name="type" placeholder="Type" required><br>
+    <input type="text" name="owner" placeholder="Owner Name" required><br>
+    <button type="submit">Add Car</button>
+  </form>
+  <br>
+  <a href="/home">Back to Home</a>
+</body>
+</html>

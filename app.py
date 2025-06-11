@@ -1,123 +1,125 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session
-import psycopg2
-import bcrypt
+from flask import Flask, render_template, request, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
+import bcrypt
 
 load_dotenv()
-app = Flask(__name__)
-app.secret_key = 'super-secret-key'  # change this!
-db_url = os.getenv("DATABASE_URL")
 
-def get_conn():
-    return psycopg2.connect(db_url)
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+# ------------------ Models ------------------
+
+class Car(db.Model):
+    license_plate = db.Column(db.String(20), primary_key=True)
+    color = db.Column(db.String(50), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+    owner = db.Column(db.String(100), nullable=False)
+
+# ------------------ Utility ------------------
+
+def get_passcode_hash():
+    return os.getenv("PASSCODE_HASH", "")
+
+def check_passcode(passcode):
+    stored_hash = get_passcode_hash().encode()
+    return bcrypt.checkpw(passcode.encode(), stored_hash)
+
+def update_passcode(new_passcode):
+    hashed = bcrypt.hashpw(new_passcode.encode(), bcrypt.gensalt())
+    with open(".env", "w") as f:
+        f.write(f"PASSCODE_HASH={hashed.decode()}")
+
+# ------------------ Routes ------------------
 
 @app.route('/')
 def index():
-    if not session.get('authenticated'):
-        return redirect('/login')
-    return render_template('index.html')
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        input_pass = request.form['passcode'].encode('utf-8')
-        conn = get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT passcode_hash FROM settings ORDER BY id DESC LIMIT 1")
-        hashed = cur.fetchone()[0].encode('utf-8')
-        conn.close()
-        if bcrypt.checkpw(input_pass, hashed):
-            session['authenticated'] = True
-            return redirect('/')
+        passcode = request.form['passcode']
+        if check_passcode(passcode):
+            return redirect(url_for('home'))
         return "Invalid passcode", 403
     return render_template('login.html')
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect('/login')
+@app.route('/home')
+def home():
+    return render_template('home.html')
 
 @app.route('/add', methods=['GET', 'POST'])
-def add_car():
+def add():
     if request.method == 'POST':
         license_plate = request.form['license_plate']
         color = request.form['color']
         type_ = request.form['type']
-        owner_name = request.form['owner_name']
-
-        if not all([license_plate, color, type_, owner_name]):
-            return "All fields required", 400
-
-        conn = get_conn()
-        cur = conn.cursor()
+        owner = request.form['owner']
+        if not all([license_plate, color, type_, owner]):
+            return "All fields are required", 400
+        car = Car(license_plate=license_plate, color=color, type=type_, owner=owner)
         try:
-            cur.execute("INSERT INTO cars VALUES (%s, %s, %s, %s)",
-                        (license_plate, color, type_, owner_name))
-            conn.commit()
+            db.session.add(car)
+            db.session.commit()
+            return redirect(url_for('home'))
         except:
-            return "Car already exists", 400
-        finally:
-            conn.close()
-        return redirect('/')
+            return "Car with that license plate already exists", 400
     return render_template('add.html')
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    results = []
     if request.method == 'POST':
-        filters = {
-            "license_plate": request.form['license_plate'],
-            "color": request.form['color'],
-            "type": request.form['type'],
-            "owner_name": request.form['owner_name']
-        }
-        conditions = []
-        values = []
+        license_plate = request.form['license_plate']
+        color = request.form['color']
+        type_ = request.form['type']
+        owner = request.form['owner']
 
-        for key, value in filters.items():
-            if value:
-                conditions.append(f"{key} ILIKE %s")
-                values.append(f"%{value}%")
+        query = Car.query
+        if license_plate:
+            query = query.filter_by(license_plate=license_plate)
+        if color:
+            query = query.filter_by(color=color)
+        if type_:
+            query = query.filter_by(type=type_)
+        if owner:
+            query = query.filter_by(owner=owner)
 
-        sql = "SELECT * FROM cars"
-        if conditions:
-            sql += " WHERE " + " AND ".join(conditions)
-
-        conn = get_conn()
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        results = cur.fetchall()
-        conn.close()
-        return render_template('search.html', results=results)
-    return render_template('search.html')
+        results = query.all()
+    return render_template('search.html', results=results)
 
 @app.route('/delete', methods=['GET', 'POST'])
 def delete():
     if request.method == 'POST':
-        plate = request.form['license_plate']
-        conn = get_conn()
-        cur = conn.cursor()
-        cur.execute("DELETE FROM cars WHERE license_plate = %s", (plate,))
-        conn.commit()
-        conn.close()
-        return redirect('/')
+        license_plate = request.form['license_plate']
+        car = Car.query.get(license_plate)
+        if car:
+            db.session.delete(car)
+            db.session.commit()
+            return redirect(url_for('home'))
+        return "Car not found", 404
     return render_template('delete.html')
 
-@app.route('/change_passcode', methods=['POST'])
+@app.route('/change', methods=['GET', 'POST'])
 def change_passcode():
-    old = request.form['old_pass'].encode('utf-8')
-    new = request.form['new_pass'].encode('utf-8')
+    if request.method == 'POST':
+        new_passcode = request.form['new_passcode']
+        update_passcode(new_passcode)
+        return "Passcode updated successfully!"
+    return '''
+        <form method="post">
+            <input type="password" name="new_passcode" placeholder="New Passcode" required>
+            <input type="submit" value="Change Passcode">
+        </form>
+    '''
 
-    conn = get_conn()
-    cur = conn.cursor()
-    cur.execute("SELECT passcode_hash FROM settings ORDER BY id DESC LIMIT 1")
-    current_hash = cur.fetchone()[0].encode('utf-8')
-    if not bcrypt.checkpw(old, current_hash):
-        conn.close()
-        return "Incorrect current passcode", 403
+# ------------------ Run ------------------
 
-    new_hash = bcrypt.hashpw(new, bcrypt.gensalt()).decode('utf-8')
-    cur.execute("INSERT INTO settings (passcode_hash) VALUES (%s)", (new_hash,))
-    conn.commit()
-    conn.close()
-    return redirect('/')
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)

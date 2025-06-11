@@ -1,11 +1,5 @@
 import bcrypt
 
-# Change this to your initial passcode
-plain_passcode = b"admin123"
-
-# Generate a bcrypt hash
-hashed = bcrypt.hashpw(plain_passcode, bcrypt.gensalt())
-
-# Print the result
-print("Hashed passcode:")
-print(hashed.decode())
+new_pass = input("Enter new passcode: ")
+hashed = bcrypt.hashpw(new_pass.encode(), bcrypt.gensalt())
+print(f"PASSCODE_HASH={hashed.decode()}")

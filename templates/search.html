@@ -1,14 +1,25 @@
-<form method="post">
-  <input name="license_plate" placeholder="License Plate" />
-  <input name="color" placeholder="Color" />
-  <input name="type" placeholder="Type" />
-  <input name="owner_name" placeholder="Owner Name" />
-  <button type="submit">Search</button>
-</form>
-{% if results %}
-  <ul>
-    {% for r in results %}
-      <li>{{ r }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+<!DOCTYPE html>
+<html>
+<head><title>Search Cars</title></head>
+<body>
+  <h2>Search Cars</h2>
+  <form method="POST">
+    <input type="text" name="license_plate" placeholder="License Plate"><br>
+    <input type="text" name="color" placeholder="Color"><br>
+    <input type="text" name="type" placeholder="Type"><br>
+    <input type="text" name="owner" placeholder="Owner Name"><br>
+    <button type="submit">Search</button>
+  </form>
+
+  {% if results %}
+    <h3>Results:</h3>
+    <ul>
+      {% for car in results %}
+        <li>{{ car.license_plate }} - {{ car.color }} - {{ car.type }} - {{ car.owner }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <br>
+  <a href="/home">Back to Home</a>
+</body>
+</html>
