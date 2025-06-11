@@ -1,21 +1,17 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Page Title</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-
-  <title>Delete Car</title>
+  <title>Delete</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <h2>Delete a Car</h2>
+  <h2>מחיקת רכב</h2>
   <form method="POST">
-    <input type="text" name="license_plate" placeholder="License Plate" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
-    <button type="submit">Delete</button>
+    <input type="text" name="license_plate" placeholder="מספר רכב" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+    <button type="submit">מחיקה</button>
   </form>
 
   {% if message %}
@@ -23,6 +19,6 @@
   {% endif %}
 
   <br>
-  <a href="/home" class="link-button">Back to Home</a>
+  <a href="/home" class="link-button">חזרה</a>
 </body>
 </html>

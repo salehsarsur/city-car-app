@@ -1,24 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <head>
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Page Title</title>
+  <title>Search</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
-  <title>Search Cars</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
 <body>
-  <h2>Add Car</h2>
+  <h2>הוספת רכב</h2>
   <form method="POST">
-    <input type="text" name="license_plate" placeholder="License Plate" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required><br>
-    <input type="text" name="color" placeholder="Color" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required><br>
-    <input type="text" name="type" placeholder="Type" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required><br>
-    <input type="text" name="owner" placeholder="Owner Name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required><br>
-    <button type="submit">Search</button>
+    <input type="text" name="license_plate" placeholder="מספר רכב" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required><br>
+    <input type="text" name="color" placeholder="צבע" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required><br>
+    <input type="text" name="type" placeholder="סוג" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required><br>
+    <input type="text" name="owner" placeholder="שם בעל הרכב" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required><br>
+    <button type="submit">הוספה</button>
   </form>
 
   {% if results %}
@@ -30,6 +27,6 @@
     </ul>
   {% endif %}
   <br>
-  <a href="/home" class="link-button">Back to Home</a>
+  <a href="/home" class="link-button">חזרה</a>
 </body>
 </html>
