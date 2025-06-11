@@ -1,0 +1,14 @@
+<form method="post">
+  <input name="license_plate" placeholder="License Plate" />
+  <input name="color" placeholder="Color" />
+  <input name="type" placeholder="Type" />
+  <input name="owner_name" placeholder="Owner Name" />
+  <button type="submit">Search</button>
+</form>
+{% if results %}
+  <ul>
+    {% for r in results %}
+      <li>{{ r }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
