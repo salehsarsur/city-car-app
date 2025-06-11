@@ -122,6 +122,7 @@ def search():
 @app.route('/delete', methods=['GET', 'POST'])
 @login_required
 def delete():
+    message = None
     if request.method == 'POST':
         license_plate = request.form['license_plate']
         car = db.session.get(Car, license_plate)
@@ -130,7 +131,7 @@ def delete():
             db.session.commit()
             return redirect(url_for('home'))
         message = "Car not found"
-    return render_template('delete.html', message = message)
+    return render_template('delete.html', message=message)
 
 @app.route('/change', methods=['GET', 'POST'])
 def change_passcode():
