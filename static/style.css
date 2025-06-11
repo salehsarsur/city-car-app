@@ -46,7 +46,8 @@ form {
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  width: 320px;
+  width: 100%;
+  max-width: 400px;
   gap: 12px;
   margin-top: 20px;
 }
@@ -147,4 +148,30 @@ li {
 .centered {
   text-align: center;
   margin-top: 40px;
+}
+
+/* Responsive Layout */
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  form {
+    width: 100%;
+    padding: 20px;
+  }
+
+  ul {
+    width: 100%;
+  }
+
+  button,
+  input[type="text"],
+  input[type="password"] {
+    font-size: 14px;
+  }
+
+  h2, h3 {
+    font-size: 18px;
+  }
 }
