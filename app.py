@@ -129,8 +129,8 @@ def delete():
             db.session.delete(car)
             db.session.commit()
             return redirect(url_for('home'))
-        return "Car not found", 404
-    return render_template('delete.html')
+        message = "Car not found"
+    return render_template('delete.html', message = message)
 
 @app.route('/change', methods=['GET', 'POST'])
 def change_passcode():

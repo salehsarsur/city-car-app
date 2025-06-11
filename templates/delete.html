@@ -5,13 +5,17 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="centered">
-    <h2>Delete a Car</h2>
-    <form method="POST">
-      <input type="text" name="license_plate" placeholder="License Plate" required>
-      <button type="submit">Delete</button>
-    </form>
-    <a href="/home" class="link-button">Back to Home</a>
-  </div>
+  <h2>Delete a Car</h2>
+  <form method="POST">
+    <input type="text" name="license_plate" placeholder="License Plate" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+    <button type="submit">Delete</button>
+  </form>
+
+  {% if message %}
+    <p style="color: red; margin-top: 10px;">{{ message }}</p>
+  {% endif %}
+
+  <br>
+  <a href="/home" class="link-button">Back to Home</a>
 </body>
 </html>
